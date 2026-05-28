@@ -3,7 +3,8 @@ import streamlit as st
 from backend import (
     init_tasks,
     get_tasks,
-    mark_task_done
+    mark_task_done,
+    delete_task
 )
 from component.input import task_input_component
 
@@ -32,7 +33,7 @@ tasks = get_tasks()
 
 for i, task in enumerate(tasks):
 
-    col1, col2 = st.columns([0.8, 0.2])
+    col1, col2, col3 = st.columns([0.8, 0.2, 0.2])
 
     with col1:
 
@@ -52,8 +53,37 @@ for i, task in enumerate(tasks):
 
             if st.button(
                 "Marquer comme fait",
-                key=f"done_{i}"
+                key=f"done_{i}",
             ):
 
                 mark_task_done(i)
                 st.rerun()
+
+    with col3:
+
+        st.markdown(
+            f"""
+            <style>
+            .st-key-delete_{i} button {{
+                background-color: #d32f2f !important;
+                color: white !important;
+                border: 1px solid #b71c1c !important;
+            }}
+
+            .st-key-delete_{i} button:hover {{
+                background-color: #b71c1c !important;
+                color: white !important;
+                border: 1px solid #8e0000 !important;
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
+        if st.button(
+            "Supprimer",
+            key=f"delete_{i}"
+        ):
+
+            delete_task(i)
+            st.rerun()
