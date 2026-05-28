@@ -1,27 +1,63 @@
-# fichier : app.py
 import streamlit as st
 
-# Stockage des tâches en mémoire (disparaît si on relance l'app)
-if "tasks" not in st.session_state:
-    st.session_state["tasks"] = []
+from backend import (
+    init_tasks,
+    add_task,
+    get_tasks,
+    mark_task_done
+)
+
+# =====================================
+# INITIALISATION
+# =====================================
+
+init_tasks()
+
+# =====================================
+# INTERFACE
+# =====================================
 
 st.title("Ma TodoList")
 
-# Ajouter une nouvelle tâche
+# Ajouter une tâche
 new_task = st.text_input("Ajouter une tâche")
+
 if st.button("Ajouter"):
-    if new_task.strip() != "":
-        st.session_state["tasks"].append({"task": new_task, "done": False})
 
-# Afficher les tâches
+    add_task(new_task)
+
+# =====================================
+# AFFICHAGE DES TÂCHES
+# =====================================
+
 st.subheader("Liste des tâches")
-for i, t in enumerate(st.session_state["tasks"]):
-    col1, col2 = st.columns([0.8, 0.2])
-    with col1:
-        st.write(("Terminé - " if t["done"] else "À faire - ") + t["task"])
-    with col2:
-        if st.button("Marquer comme fait", key=f"done_{i}"):
-            st.session_state["tasks"][i]["done"] = True
-            st.rerun()
 
-# Lancer l'application avec : streamlit run app.py
+tasks = get_tasks()
+
+for i, task in enumerate(tasks):
+
+    col1, col2 = st.columns([0.8, 0.2])
+
+    with col1:
+
+        status = (
+            "Terminé"
+            if task["done"]
+            else "À faire"
+        )
+
+        st.write(
+            f"{status} - {task['task']}"
+        )
+
+    with col2:
+
+        if not task["done"]:
+
+            if st.button(
+                "Marquer comme fait",
+                key=f"done_{i}"
+            ):
+
+                mark_task_done(i)
+                st.rerun()
